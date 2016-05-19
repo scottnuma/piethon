@@ -1,0 +1,146 @@
+<!doctype html>
+
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+
+    <title>Piethon Tutorial</title>
+    <!-- Bootstrap -->
+    <link href="css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- HTML5 shim and Respond.js for IE8 support of HTML5
+         elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the
+         page via file:// -->
+
+    <!--[if lt IE 9]>
+      <script src = "https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+      <script src = "https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+      <![endif]-->
+
+    <!--[if lt IE 9]>
+    <script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+  <![endif]-->
+
+    <link rel="stylesheet" href="css/codemirror.css">
+    <link rel="stylesheet" href="css/styles.css">
+
+    <link href='https://fonts.googleapis.com/css?family=Inconsolata' rel='stylesheet' type='text/css'>
+</head>
+
+<body>
+    <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+
+    <!-- Include all compiled plugins (below), or include individual files as needed -->
+    <script src="js/bootstrap.min.js"></script>
+
+    <!-- Skulpt -->
+    <script src="http://www.skulpt.org/static/skulpt.min.js" type="text/javascript"></script>
+    <script src="http://www.skulpt.org/static/skulpt-stdlib.js" type="text/javascript"></script>
+
+    <!-- Code Mirror -->
+    <script src="js/codemirror.js"></script>
+    <script src="js/python.js"></script>
+
+    <header>Piethon</header>
+    <main>
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-md-4">
+                    <div>
+                        <h2>Editable</h2>
+
+                    </div>
+                </div>
+                <div class="col-md-8">
+                    <h3>Try This</h3>
+                    <form>
+                        <textarea id="yourcode">
+def i_area_of_rectangle(side1, side2):
+  """Calculates area of a rectangle given side lengths
+  >>> i_area_of_rectangle(3,4)
+  12
+  >>> i_area_of_rectangle(5,3)
+  15
+  >>> i_area_of_rectangle(100,2)
+  200
+  """
+  "ERASE THIS LINE AND REPLACE WITH YOURS"
+                        </textarea>
+                        <br />
+                        <button type="button" onclick="runit()">Run</button>
+                    </form>
+
+                    <pre id="output"></pre>
+                    <!-- If you want turtle graphics include a canvas -->
+                    <div id="mycanvas"></div>
+                    <div id="error-msg"></div>
+                </div>
+            </div>
+        </div>
+    </main>
+    <footer>
+        Developed by Scott Numamoto
+    </footer>
+    <script type="text/javascript">
+        // output functions are configurable.  This one just appends some text
+        // to a pre element.
+        function outf(text) {
+            var mypre = document.getElementById("output");
+            mypre.innerHTML = mypre.innerHTML + text;
+        }
+
+        function builtinRead(x) {
+            if (Sk.builtinFiles === undefined || Sk.builtinFiles["files"][x] === undefined)
+                throw "File not found: '" + x + "'";
+            return Sk.builtinFiles["files"][x];
+        }
+
+        // Here's everything you need to run a python program in skulpt
+        // grab the code from your textarea
+        // get a reference to your pre element for output
+        // configure the output function
+        // call Sk.importMainWithBody()
+        function runit() {
+            var textAreaString = myCodeMirror.getValue();
+
+            // Clear the ouput textarea
+            var mypre = document.getElementById("output");
+            mypre.innerHTML = '';
+
+            Sk.pre = "output";
+            Sk.configure({
+                output: outf,
+                read: builtinRead
+            });
+            (Sk.TurtleGraphics || (Sk.TurtleGraphics = {})).target = 'mycanvas';
+            var myPromise = Sk.misceval.asyncToPromise(function() {
+                return Sk.importMainWithBody("<stdin>", false, textAreaString, true);
+            });
+            myPromise.then(function(mod) {
+                    console.log('success');
+                    $('#error-msg').text("");
+                },
+                function(error) {
+                    var stringError = error.toString();
+                    console.log(stringError);
+                    $('#error-msg').text(stringError);
+                });
+        }
+    </script>
+    <script type="text/javascript">
+        var textArea = document.getElementById("yourcode")
+        var myCodeMirror = CodeMirror(function(elt) {
+            textArea.parentNode.replaceChild(elt, textArea);
+        }, {
+            lineNumbers: true,
+            value: textArea.value,
+            mode: "python"
+        });
+    </script>
+
+</body>
+
+</html>
